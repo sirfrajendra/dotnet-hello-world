@@ -2,28 +2,19 @@ using dotnet_hello_world.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel before building the app
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(80);
+});
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(80);
-});
-
-
-app.UseHttpsRedirection();
-
+// Skip HTTPS inside container (HTTPS terminates at load balancer or gateway)
 app.UseStaticFiles();
 app.UseAntiforgery();
 
