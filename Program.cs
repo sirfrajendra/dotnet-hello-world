@@ -16,6 +16,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(80);
+});
+
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
