@@ -1,0 +1,46 @@
+name: Build .NET 8 Project
+
+on:
+  push:
+    branches:
+      - main     # Run when changes are pushed to 'main' branch
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build:
+    name: Build and Upload Artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        # This pulls your repository's source code into the runner
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+        # Downloads and installs .NET SDK version 8 on the runner
+
+      - name: Restore dependencies
+        run: dotnet restore
+        # Restores NuGet packages
+
+      - name: Build the project
+        run: dotnet build --configuration Release --no-restore
+        # Compiles the app in Release mode
+
+      - name: Publish the project
+        run: dotnet publish --configuration Release --output ./publish
+        # Builds and publishes the output to the `./publish` folder
+
+      - name: Zip the published files
+        run: zip -r publish.zip ./publish
+        # Creates a zip file of the published build
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-8-build
+          path: publish.zip
+        # This makes the zip downloadable from the GitHub Actions UI
